@@ -76,16 +76,33 @@ pip install -r requirements.txt
 
 ### 4. Hướng dẫn chạy chương trình
 
-**Cách 1: Chạy trực tiếp qua Python**
-```bash
-# Chạy riêng Phần I (Nam, Nhân, Đức Anh, Lộc)
-python3 -m src.main_part1
+#### 4.1. Lệnh chạy độc lập cho từng thành viên (Kiểm tra output riêng)
+Mỗi thành viên có thể chạy riêng mã nguồn của mình để kiểm tra file output tương ứng:
 
-# Chạy toàn bộ pipeline hệ thống
+| Thành viên | Lệnh chạy tại thư mục `project/` | File output tự kiểm tra | Ghi chú |
+| :--- | :--- | :--- | :--- |
+| **Đinh Hải Nam (3.1)** | `cp models/grammar.cfg output/grammar.txt` | `output/grammar.txt` | Xuất tập luật văn phạm CFG |
+| **Thành Nhân (3.2)** | `python3 -m src.generator` | `output/samples.txt` | Sinh tối đa 10.000 câu mẫu |
+| **Đức Anh (3.3)** | `python3 -m src.parser` | `output/parse-results.txt` | Phân tích cú pháp `sentences.txt` |
+| **Xuân Lộc (Tokenizer)** | `python3 -m src.tokenizer` | Console output | Kiểm tra tách từ & gộp từ ghép |
+
+#### 4.2. Lệnh chạy tổng hợp Phần I (Xuân Lộc tổng hợp)
+Sau khi các thành viên hoàn thành hoặc cập nhật code mới, chạy 1 lệnh duy nhất để tự động xuất **cả 3 file output của Phần I**:
+```bash
+python3 -m src.main_part1
+```
+*Kết quả sinh ra đủ 3 file:*
+* `output/grammar.txt` (từ Nam)
+* `output/samples.txt` (từ Nhân)
+* `output/parse-results.txt` (từ Đức Anh)
+
+#### 4.3. Lệnh chạy toàn bộ hệ thống (End-to-End Pipeline)
+Chạy toàn bộ pipeline từ Phần I đến Phần IV:
+```bash
 python3 -m src.main
 ```
 
-**Cách 2: Chạy kiểm thử qua Docker (Môi trường chấm bài)**
+#### 4.4. Chạy kiểm thử qua Docker (Môi trường chấm bài của giảng viên)
 ```bash
 docker build -t course-assistant .
 docker run --rm -v $(pwd)/input:/nlp/input -v $(pwd)/output:/nlp/output course-assistant

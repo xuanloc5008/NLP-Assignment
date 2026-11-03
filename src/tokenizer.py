@@ -11,33 +11,16 @@ QUY ƯỚC CHUNG CHO CẢ NHÓM (Nam viết grammar, Đức Anh parse, Nhân sin
   4. Dấu '/' tách thành các token riêng (vd: 'llm/rag' -> 'llm', 'rag').
   5. Số giữ nguyên là token riêng ('tuần 3' -> 'tuần', '3').
 
-Danh sách từ ghép nằm ở COMPOUND_WORDS bên dưới (viết bằng dấu cách, tự động
-được ghép theo thuật toán longest-match). Muốn thêm từ ghép -> chỉ cần thêm vào
-danh sách, và dùng đúng dạng có '_' trong grammar.cfg.
+Danh sách từ ghép được TỰ ĐỘNG lấy từ các terminal có '_' trong models/grammar.cfg
+(qua grammar_loader), nên tokenizer luôn khớp với văn phạm của Nam. Muốn thêm từ ghép
+ngoài grammar -> truyền extra_compounds=['cụm từ', ...].
+Ngoài ra mã chuẩn đầu ra viết 'L.O.2.5' được chuẩn hoá thành 'lo2.5' (đúng dạng trong grammar).
 """
 import re
+import os
 import unicodedata
 
-# Từ ghép / cụm thuật ngữ cần gộp thành 1 token (viết thường, ngăn cách bằng dấu cách).
-COMPOUND_WORDS = [
-    # --- Thông tin môn học / thi cử ---
-    "tín chỉ", "môn học", "bao nhiêu", "thi giữa kỳ", "thi cuối kỳ", "giữa kỳ", "cuối kỳ",
-    "học kỳ", "đề cương", "chuẩn đầu ra", "nội dung", "kế hoạch", "lịch học",
-    # --- Bài tập lớn / quy định / tài liệu ---
-    "bài tập lớn", "bài tập", "thời hạn", "hạn nộp", "yêu cầu", "xây dựng",
-    "sử dụng", "quy định", "tài liệu tham khảo", "tài liệu", "giáo trình", "tham khảo",
-    "liên quan", "phương pháp",
-    # --- Từ hỏi / cụm hỏi ---
-    "khi nào", "ở đâu", "như thế nào", "bao lâu", "có được", "có thể", "tìm hiểu",
-    # --- Thuật ngữ NLP (tiếng Anh nhiều từ) ---
-    "context free grammar", "context-free grammar",
-    "semantic grammar", "dependency grammar", "augmented grammar",
-    "selectional restriction", "semantic network", "question answering",
-    "knowledge representation", "pos tagging", "logical form", "thematic roles",
-    "local discourse context", "word sense disambiguation",
-    "statistical nlp", "python nlp", "top-down parsing", "bottom-up parsing",
-    "chart parsing",
-]
+from src.grammar_loader import DEFAULT_GRAMMAR_PATH, grammar_terminals
 
 # Dấu câu cần bỏ ở đầu/cuối token.
 _EDGE_PUNCT = "?!.,;:\"'()[]{}…“”‘’"
@@ -46,8 +29,11 @@ _EDGE_PUNCT = "?!.,;:\"'()[]{}…“”‘’"
 class VietnameseTokenizer:
     """Tách từ + gộp từ ghép (longest match) cho câu hỏi tiếng Việt miền Course Assistant."""
 
-    def __init__(self, extra_compounds: list[str] | None = None):
-        words = list(COMPOUND_WORDS) + list(extra_compounds or [])
+    def __init__(self, grammar_path: str | None = DEFAULT_GRAMMAR_PATH,
+                 extra_compounds: list[str] | None = None):
+        words = list(extra_compounds or [])
+        if grammar_path and os.path.exists(grammar_path):
+            words += [t.replace("_", " ") for t in grammar_terminals(grammar_path) if "_" in t]
         # key: tuple các tiếng -> token ghép. Vd ('bài','tập','lớn') -> 'bài_tập_lớn'
         self._compounds: dict[tuple[str, ...], str] = {}
         for w in words:
@@ -64,6 +50,12 @@ class VietnameseTokenizer:
         return re.sub(r"\s+", " ", text.lower()).strip()
 
     @staticmethod
+    def _normalize_token(tok: str) -> str:
+        """'l.o.2.5' -> 'lo2.5' (dạng mã chuẩn đầu ra dùng trong grammar)."""
+        m = re.fullmatch(r"l\.o\.?(\d+(?:\.\d+)*)", tok)
+        return "lo" + m.group(1) if m else tok
+
+    @staticmethod
     def _split_raw(text: str) -> list[str]:
         """Tách theo khoảng trắng, tách '/' thành token riêng, bỏ dấu câu ở biên."""
         tokens: list[str] = []
@@ -73,7 +65,7 @@ class VietnameseTokenizer:
                     continue  # bỏ hẳn dấu '/', chỉ dùng làm điểm tách
                 piece = piece.strip(_EDGE_PUNCT)
                 if piece:
-                    tokens.append(piece)
+                    tokens.append(VietnameseTokenizer._normalize_token(piece))
         return tokens
 
     # ---------------------------------------------------------------- public API
@@ -118,6 +110,7 @@ if __name__ == "__main__":
         "Bài tập lớn yêu cầu xây dựng những gì?",
         "Chương 4 học vào tuần nào?",
         "L.O.2.5 là gì?",
+        "Tài liệu tham khảo về statistical NLP là gì?",
         "Có được dùng LLM/RAG không?",
         "Chương nào nói về semantic grammar?",
         "Hôm nay ở TP.HCM có mưa không?",

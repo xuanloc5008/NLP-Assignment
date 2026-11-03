@@ -77,6 +77,7 @@ class SentenceGenerator:
         Duyệt sinh câu bằng NLTK generate.
         """
         samples = []
+        seen = set()
         if not self.grammar:
             print("[Lỗi] Văn phạm chưa được khởi tạo.")
             return samples
@@ -86,7 +87,10 @@ class SentenceGenerator:
             for sentence_tokens in generate(self.grammar, n=max_samples, depth=max_depth):
                 # Thay khoảng trắng cho dấu '_' để xuất câu tự nhiên
                 sentence = " ".join(sentence_tokens).replace('_', ' ')
-                samples.append(sentence)
+                # nhiều dẫn xuất khác nhau có thể cho cùng 1 câu (vd 'llm' 'rag' và 'llm_rag') -> bỏ trùng
+                if sentence not in seen:
+                    seen.add(sentence)
+                    samples.append(sentence)
         except Exception as e:
             print(f"[Lỗi] Xảy ra lỗi trong quá trình sinh câu: {e}")
             

@@ -1,49 +1,84 @@
 """
-Script chạy kiểm thử riêng Phần I (Grammar, Generation, Parser)
-Phụ trách: Thành viên 4 (Lead Integrator) tổng hợp từ Thành viên 1, 2, 3
+Chạy tổng hợp Phần I: Viết văn phạm và Parser (Mục 3.1 + 3.2 + 3.3)
+Phụ trách: Xuân Lộc (Lead Integrator)
+
+    python3 -m src.main_part1
+
+Sinh đủ 3 file trong output/:
+    grammar.txt        (3.1 - Nam)   : bản sao tập luật models/grammar.cfg
+    samples.txt        (3.2 - Nhân)  : tối đa 10.000 câu hợp lệ sinh từ văn phạm
+    parse-results.txt  (3.3 - Đức Anh): cây cú pháp / '()' cho từng câu của input/sentences.txt
+Cuối cùng tự kiểm tra định dạng các file này.
 """
 import os
 import shutil
 import sys
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, PROJECT_ROOT)
 
 from src.generator import SentenceGenerator
 from src.parser import CourseParser
 
-def run_part1():
+GRAMMAR_CFG = os.path.join(PROJECT_ROOT, "models", "grammar.cfg")
+IN_SENTENCES = os.path.join(PROJECT_ROOT, "input", "sentences.txt")
+OUT_GRAMMAR = os.path.join(PROJECT_ROOT, "output", "grammar.txt")
+OUT_SAMPLES = os.path.join(PROJECT_ROOT, "output", "samples.txt")
+OUT_PARSE = os.path.join(PROJECT_ROOT, "output", "parse-results.txt")
+
+
+def _read_lines(path: str) -> list[str]:
+    with open(path, "r", encoding="utf-8") as f:
+        return [l.rstrip("\n") for l in f if l.strip()]
+
+
+def validate() -> bool:
+    """Kiểm tra định dạng 3 file output theo yêu cầu đề bài."""
+    ok = True
+
+    def check(cond: bool, msg: str):
+        nonlocal ok
+        print(("  [OK]   " if cond else "  [FAIL] ") + msg)
+        ok &= cond
+
+    print("\n--- Kiểm tra định dạng output ---")
+    check(os.path.exists(OUT_GRAMMAR) and os.path.getsize(OUT_GRAMMAR) > 0, "grammar.txt tồn tại và không rỗng")
+
+    samples = _read_lines(OUT_SAMPLES) if os.path.exists(OUT_SAMPLES) else []
+    check(0 < len(samples) <= 10000, f"samples.txt có {len(samples)} câu (1..10000)")
+    check(len(samples) == len(set(samples)), "samples.txt không có câu trùng")
+
+    sentences = _read_lines(IN_SENTENCES)
+    results = _read_lines(OUT_PARSE) if os.path.exists(OUT_PARSE) else []
+    check(len(results) == len(sentences),
+          f"parse-results.txt có {len(results)} dòng = {len(sentences)} câu input")
+    check(all(r == "()" or (r.startswith("(S") and r.endswith(")")) for r in results),
+          "mỗi dòng parse-results là cây '(S ...)' hoặc '()'")
+    return ok
+
+
+def run_part1() -> bool:
     print("=" * 60)
     print("CHẠY PHẦN I: VIẾT VĂN PHẠM VÀ PARSER")
     print("=" * 60)
+    os.makedirs(os.path.join(PROJECT_ROOT, "output"), exist_ok=True)
 
-    grammar_cfg = os.path.join("models", "grammar.cfg")
-    out_grammar = os.path.join("output", "grammar.txt")
-    out_samples = os.path.join("output", "samples.txt")
-    in_sentences = os.path.join("input", "sentences.txt")
-    out_parse = os.path.join("output", "parse-results.txt")
+    print("\n[1/3] Mục 3.1 - xuất văn phạm")
+    shutil.copyfile(GRAMMAR_CFG, OUT_GRAMMAR)
+    print(f"  -> {OUT_GRAMMAR}")
 
-    os.makedirs("output", exist_ok=True)
-    os.makedirs("input", exist_ok=True)
+    print("\n[2/3] Mục 3.2 - sinh câu")
+    SentenceGenerator(GRAMMAR_CFG).save_samples(OUT_SAMPLES, max_samples=10000)
 
-    # 1. Mục 3.1: Xuất văn phạm (Thành viên 1)
-    print("[1/3] Xuất văn phạm (Mục 3.1)...")
-    if os.path.exists(grammar_cfg):
-        shutil.copyfile(grammar_cfg, out_grammar)
-        print(f"-> Đã tạo {out_grammar}")
+    print("\n[3/3] Mục 3.3 - phân tích cú pháp")
+    CourseParser(GRAMMAR_CFG).process_file(IN_SENTENCES, OUT_PARSE)
 
-    # 2. Mục 3.2: Sinh câu (Thành viên 2)
-    print("[2/3] Sinh câu hợp lệ (Mục 3.2)...")
-    gen = SentenceGenerator(grammar_cfg)
-    gen.save_samples(out_samples, max_samples=10000)
-
-    # 3. Mục 3.3: Parser (Thành viên 3)
-    print("[3/3] Phân tích cú pháp (Mục 3.3)...")
-    parser = CourseParser(grammar_cfg)
-    parser.process_file(in_sentences, out_parse)
-
+    ok = validate()
+    print("\n" + "=" * 60)
+    print("HOÀN THÀNH PHẦN I" if ok else "PHẦN I CÒN LỖI - xem các dòng [FAIL] ở trên")
     print("=" * 60)
-    print("Hoàn thành Phần I!")
-    print("=" * 60)
+    return ok
+
 
 if __name__ == "__main__":
-    run_part1()
+    sys.exit(0 if run_part1() else 1)

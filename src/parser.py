@@ -13,6 +13,9 @@ import nltk
 
 EMPTY_TREE = "()"
 
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+DEFAULT_GRAMMAR_PATH = os.path.join(PROJECT_ROOT, "models", "grammar.cfg")
+
 # Dấu câu bị loại bỏ khi tách token (giữ lại '.' bên trong token, ví dụ 'lo2.5')
 _PUNCT_RE = re.compile(r"[?!,;:\"'()\[\]{}…]")
 # 'L.O.2.5' / 'LO 2.5' / 'lo2.5' -> 'lo2.5'
@@ -20,7 +23,7 @@ _LO_RE = re.compile(r"\bl\.?\s*o\.?\s*(\d+)\.(\d+)")
 
 
 class CourseParser:
-    def __init__(self, grammar_path: str):
+    def __init__(self, grammar_path: str = DEFAULT_GRAMMAR_PATH):
         self.grammar_path = grammar_path
         with open(grammar_path, encoding="utf-8") as f:
             text = unicodedata.normalize("NFC", f.read())

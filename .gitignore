@@ -2,3 +2,63 @@
 __pycache__/
 *.pyc
 venv/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C environments (virtual environments)
+venv/
+env/
+.env
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Jupyter Notebook checkpoints & cache
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Hệ điều hành
+.DS_Store
+Thumbs.db
+
+# Large Datasets & Processed Files (tránh push file dữ liệu quá nặng)
+data/
+*.csv
+*.tsv
+*.jsonl
+*.parquet
+*.h5
+*.pkl
+*.pickle
+
+# Model Weights & Checkpoints (tránh vượt giới hạn 100MB của GitHub)
+checkpoints/
+models/
+saved_models/
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+
+# Logs & Metrics (Tensorboard, Wandb, v.v.)
+runs/
+logs/
+wandb/
+*.log   
+
+# Bỏ qua tệp txt lưu command (thay bằng tên file thực tế của bạn)
+git_commands.txt
+
+# Bỏ qua chính tệp .gitignore
+.gitignore

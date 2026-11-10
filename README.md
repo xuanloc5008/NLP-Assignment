@@ -136,6 +136,7 @@ docker run --rm -v $(pwd)/input:/nlp/input -v $(pwd)/output:/nlp/output course-a
 - Sinh câu trả lời tự nhiên bằng mẫu câu (Template-based NLG).
 - Cơ chế Fallback an toàn: Với câu ngoài phạm vi hoặc không tìm thấy dữ liệu, xuất đúng câu thông báo chuẩn:
   > *"Xin lỗi, tôi không tìm thấy thông tin này trong dữ liệu của môn học."*
+- Chi tiết thiết kế, schema entity và giao diện với các module khác: xem [README_4.1.3.md](README_4.1.3.md).
 
 #### 5.6. Ngữ cảnh hội thoại cục bộ (Phần III)
 - Lưu trữ State Memory từ lượt tương tác trước.

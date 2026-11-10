@@ -15,7 +15,7 @@ from src.semantic import SemanticInterpreter
 from src.intent_entity import IntentEntityDetector
 from src.knowledge_base import KnowledgeBase
 from src.query_engine import QueryEngine
-from src.nlg import AnswerGenerator
+from src.nlg import AnswerGenerator, make_detector
 from src.dialogue import DialogueManager
 from src.evaluator import SystemEvaluator
 
@@ -70,12 +70,12 @@ def main():
     kb.load_data()
     query_engine = QueryEngine(kb)
     out_query = os.path.join(output_dir, "query.txt")
-    # TODO: Thực thi ghi query.txt
 
-    # 4.1.4: Answer Generation & Fallback -> answer.txt (Thành viên 3)
+    # 4.1.4 + 4.1.5: Answer Generation & Fallback -> answer.txt (Thành viên 3)
     nlg = AnswerGenerator(query_engine)
     out_answer = os.path.join(output_dir, "answer.txt")
-    # TODO: Thực thi ghi answer.txt
+    detect = make_detector(detector, os.path.join(data_dir, "sample_queries.txt"))
+    nlg.process_file(input_file, out_query, out_answer, detect)
 
     # ------------------------------------------------------------------
     # PHẦN III: XỬ LÝ NGỮ CẢNH HỘI THOẠI CỤC BỘ (Thành viên 4)

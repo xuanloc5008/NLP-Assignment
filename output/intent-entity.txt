@@ -9,8 +9,8 @@ GET_TOPIC | {'topic': 'SEMANTIC_GRAMMAR'}
 GET_LO | {'lo_code': 'LO2.5'}
 GET_LO | {'lo_code': 'LO4.2'}
 GET_ASSIGNMENT | {'assignment_id': 'BTL01'}
-GET_ASSIGNMENT | {'assignment_part': 'PART_I', 'assignment_id': 'BTL01'}
-GET_ASSIGNMENT | {'assignment_part': 'PART_II', 'assignment_id': 'BTL01'}
+GET_ASSIGNMENT | {'assignment_id': 'BTL01', 'assignment_part': 'PART_I'}
+GET_ASSIGNMENT | {'assignment_id': 'BTL01', 'assignment_part': 'PART_II'}
 GET_RULE | {'rule_term': 'LLM_RAG'}
 GET_RULE | {'rule_term': 'AI_USAGE'}
 GET_COURSE_INFO | {'exam': 'MIDTERM'}
@@ -30,5 +30,5 @@ GET_TOPIC | {'chapter': 'CH04'}
 CONTEXT_DEPENDENT | {'topic': 'PARSING', 'context_ref': 'nó'}
 GET_TOPIC | {'chapter': 'CH11', 'topic': 'QUESTION_ANSWERING'}
 CONTEXT_DEPENDENT | {'context_ref': 'sau'}
-GET_ASSIGNMENT | {'assignment_part': 'PART_I', 'assignment_id': 'BTL01'}
+GET_ASSIGNMENT | {'assignment_id': 'BTL01', 'assignment_part': 'PART_I'}
 CONTEXT_DEPENDENT | {'context_ref': 'phần này'}

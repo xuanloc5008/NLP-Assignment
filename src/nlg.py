@@ -283,21 +283,67 @@ class AnswerGenerator:
         return r["data"]["answer"]
 
     # ================================================================ batch
-    def process_file(self, input_path: str, query_path: str, answer_path: str, detect):
+    def process_file(
+        self,
+        input_path: str,
+        query_path: str,
+        answer_path: str,
+        detect=None,
+        intent_entity_path: str | None = None,
+    ):
         """
-        detect(sentence) -> (intent, entities). Ghi query.txt và answer.txt,
-        mỗi dòng input tương ứng đúng một dòng output.
+        Nhận kết quả (intent, entities) từ bước Intent/Entity (output/intent-entity.txt hoặc hàm detect),
+        xây dựng truy vấn tới Knowledge Base (output/query.txt), truy xuất dữ liệu và sinh câu trả lời
+        (output/answer.txt). Mỗi dòng input tương ứng đúng một dòng output.
         """
+        import ast
+
         with open(input_path, encoding="utf-8") as f:
             sentences = f.read().splitlines()
 
+        ie_records = []
+        if intent_entity_path and os.path.exists(intent_entity_path):
+            with open(intent_entity_path, encoding="utf-8") as f:
+                for line in f.read().splitlines():
+                    if "|" in line:
+                        i_str, e_str = [x.strip() for x in line.split("|", 1)]
+                        try:
+                            e_dict = ast.literal_eval(e_str) if e_str.startswith("{") else {}
+                        except Exception:
+                            e_dict = {}
+                        ie_records.append((i_str, e_dict))
+
+        last_state = {}
         queries, answers = [], []
-        for s in sentences:
+        for idx, s in enumerate(sentences):
             if not s.strip():
                 queries.append("")
                 answers.append("")
                 continue
-            intent, entities = detect(s)
+            if idx < len(ie_records):
+                intent, entities = ie_records[idx]
+                entities = dict(entities)
+                if intent == "CONTEXT_DEPENDENT":
+                    ref = str(entities.get("context_ref", "")).lower()
+                    if ref == "sau" and "chapter" in last_state:
+                        ch_num = int(re.search(r"\d+", last_state["chapter"]).group())
+                        entities["chapter"] = f"CH{min(ch_num + 1, 12):02d}"
+                    elif ref == "trước" and "chapter" in last_state:
+                        ch_num = int(re.search(r"\d+", last_state["chapter"]).group())
+                        entities["chapter"] = f"CH{max(ch_num - 1, 1):02d}"
+                    elif "phần" in ref and "assignment_part" in last_state:
+                        entities["assignment_part"] = last_state["assignment_part"]
+                    elif "chapter" in last_state and "chapter" not in entities:
+                        entities["chapter"] = last_state["chapter"]
+                if "chapter" in entities:
+                    last_state["chapter"] = entities["chapter"]
+                if "assignment_part" in entities:
+                    last_state["assignment_part"] = entities["assignment_part"]
+            elif detect is not None:
+                intent, entities = detect(s)
+            else:
+                intent, entities = ("UNKNOWN", {})
+
             queries.append(self.qe.build_query(intent, entities, s))
             answers.append(self.generate_answer(intent, entities, s))
 

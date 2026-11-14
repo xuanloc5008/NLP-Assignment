@@ -177,30 +177,39 @@ class SemanticInterpreter:
 
         return "UNKNOWN()"
 
-    def process_file(self, input_path: str, output_path: str):
-        """Đọc input/sentences.txt, gọi Parser phân tích và xuất ra output/semantic.txt"""
+    def process_file(self, input_path: str, output_path: str, parse_results_path: str = None):
+        """
+        Nhận Syntactic Representation từ output/parse-results.txt (hoặc phân tích từ input/sentences.txt
+        nếu chạy độc lập) và ánh xạ sang biểu diễn ngữ nghĩa vị từ tại output/semantic.txt.
+        Pipeline: Natural Language Input -> Grammar/Parser -> Syntactic Representation -> Semantic Interpretation
+        """
         if not os.path.exists(input_path):
             print(f"Lỗi: Không tìm thấy file {input_path}.")
             return
 
-        # Khởi tạo Parser
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        grammar_path = os.path.join(project_root, "models", "grammar.cfg")
-        parser = CourseParser(grammar_path)
+        if parse_results_path is None:
+            default_parse = os.path.join(project_root, "output", "parse-results.txt")
+            if os.path.exists(default_parse):
+                parse_results_path = default_parse
 
-        # CHỈ ĐỌC file input/sentences.txt
         with open(input_path, 'r', encoding='utf-8') as f:
             sentences = f.read().splitlines()
 
+        if parse_results_path and os.path.exists(parse_results_path):
+            with open(parse_results_path, 'r', encoding='utf-8') as f:
+                parse_trees = f.read().splitlines()
+        else:
+            grammar_path = os.path.join(project_root, "models", "grammar.cfg")
+            parser = CourseParser(grammar_path)
+            parse_trees = [parser.parse_sentence(s) for s in sentences]
+
         results = []
-        for sentence in sentences:
-            # Trích xuất cây cú pháp ngay trong pipeline bộ nhớ
-            tree_str = parser.parse_sentence(sentence)
-            # Ánh xạ thành biểu diễn ngữ nghĩa
+        for idx, sentence in enumerate(sentences):
+            tree_str = parse_trees[idx] if idx < len(parse_trees) else "()"
             semantic_rep = self.interpret(sentence=sentence, parse_tree_str=tree_str)
             results.append(semantic_rep)
 
-        # Ghi file kết quả
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with open(output_path, 'w', encoding='utf-8') as f:
             for r in results:

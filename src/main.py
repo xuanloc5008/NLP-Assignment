@@ -53,29 +53,31 @@ def main():
 
     # ------------------------------------------------------------------
     # PHẦN II: DIỄN GIẢI NGỮ NGHĨA VÀ HỎI ĐÁP
+    # Pipeline: Syntactic Representation -> Semantic Interpretation
+    #           -> Intent / Entity -> Knowledge Base / Retrieval -> Answer
     # ------------------------------------------------------------------
     print("\n>>> [PHẦN II] DIỄN GIẢI NGỮ NGHĨA VÀ HỎI ĐÁP...")
-    # 4.1.1: Semantic Representation -> semantic.txt (Thành viên 2)
+    # 4.1.1: Syntactic Representation (parse-results.txt) -> Semantic Representation (semantic.txt)
     out_semantic = os.path.join(output_dir, "semantic.txt")
-    interpreter = SemanticInterpreter()
-    interpreter.process_file(input_file, out_semantic)
+    interpreter = SemanticInterpreter(os.path.join(data_dir, "entities.txt"))
+    interpreter.process_file(input_file, out_semantic, parse_results_path=out_parse)
 
-    # 4.1.2: Intent & Entity -> intent-entity.txt (Thành viên 2)
+    # 4.1.2: Semantic + Syntactic Representation -> Intent & Entity (intent-entity.txt)
     out_intent_entity = os.path.join(output_dir, "intent-entity.txt")
     detector = IntentEntityDetector(data_dir)
-    detector.process_file(out_parse, out_intent_entity)
+    detector.process_file(out_parse, out_intent_entity, semantic_path=out_semantic)
 
-    # 4.1.3: Knowledge Base & Query -> query.txt (Thành viên 3)
+    # 4.1.3: Intent/Entity -> Knowledge Base & Query (query.txt)
     kb = KnowledgeBase(data_dir)
     kb.load_data()
     query_engine = QueryEngine(kb)
     out_query = os.path.join(output_dir, "query.txt")
 
-    # 4.1.4 + 4.1.5: Answer Generation & Fallback -> answer.txt (Thành viên 3)
+    # 4.1.4 + 4.1.5: Knowledge Base Retrieval -> Answer Generation & Fallback (answer.txt)
     nlg = AnswerGenerator(query_engine)
     out_answer = os.path.join(output_dir, "answer.txt")
     detect = make_detector(detector, os.path.join(data_dir, "sample_queries.txt"))
-    nlg.process_file(input_file, out_query, out_answer, detect)
+    nlg.process_file(input_file, out_query, out_answer, detect=detect, intent_entity_path=out_intent_entity)
 
     # ------------------------------------------------------------------
     # PHẦN III: XỬ LÝ NGỮ CẢNH HỘI THOẠI CỤC BỘ (Thành viên 4)

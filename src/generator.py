@@ -74,8 +74,11 @@ class SentenceGenerator:
 
     def generate(self, max_samples: int = 10000, max_depth: int = 8) -> list[str]:
         """
-        Duyệt sinh câu bằng NLTK generate.
+        Duyệt sinh câu bằng NLTK generate, cân bằng qua tất cả các nhánh Intent dưới S
+        và giới hạn tối đa max_samples câu không trùng lặp.
         """
+        from nltk.grammar import Nonterminal
+
         samples = []
         seen = set()
         if not self.grammar:
@@ -83,13 +86,35 @@ class SentenceGenerator:
             return samples
 
         try:
-            # Sinh câu, giới hạn độ sâu để tránh đệ quy vô hạn hoặc tràn RAM
-            for sentence_tokens in generate(self.grammar, n=max_samples, depth=max_depth):
-                # Thay khoảng trắng cho dấu '_' để xuất câu tự nhiên
-                sentence = " ".join(sentence_tokens).replace('_', ' ')
-                if sentence not in seen:
-                    seen.add(sentence)
-                    samples.append(sentence)
+            s_prods = self.grammar.productions(lhs=self.grammar.start())
+            branches = [p.rhs()[0] for p in s_prods if len(p.rhs()) == 1 and isinstance(p.rhs()[0], Nonterminal)]
+            if not branches:
+                branches = [self.grammar.start()]
+
+            per_branch_quota = max(500, max_samples // len(branches))
+            # Vòng 1: lấy mẫu đều trên từng nhánh Intent để đảm bảo đủ mọi loại câu hỏi
+            for br in branches:
+                count = 0
+                for sentence_tokens in generate(self.grammar, start=br, n=per_branch_quota * 2, depth=max_depth):
+                    sentence = " ".join(sentence_tokens).replace('_', ' ')
+                    if sentence not in seen:
+                        seen.add(sentence)
+                        samples.append(sentence)
+                        count += 1
+                        if count >= per_branch_quota or len(samples) >= max_samples:
+                            break
+                if len(samples) >= max_samples:
+                    break
+
+            # Vòng 2: nếu chưa chạm ngưỡng max_samples thì lấy thêm từ toàn bộ văn phạm
+            if len(samples) < max_samples:
+                for sentence_tokens in generate(self.grammar, n=max_samples * 2, depth=max_depth):
+                    sentence = " ".join(sentence_tokens).replace('_', ' ')
+                    if sentence not in seen:
+                        seen.add(sentence)
+                        samples.append(sentence)
+                        if len(samples) >= max_samples:
+                            break
         except Exception as e:
             print(f"[Lỗi] Xảy ra lỗi trong quá trình sinh câu: {e}")
             

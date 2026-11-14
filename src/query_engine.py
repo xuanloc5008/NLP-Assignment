@@ -73,7 +73,8 @@ COURSE_ATTR_KEYWORDS = [
     ("learning_outcomes", ["chuẩn đầu ra", "learning outcome"]),
     ("department", ["khoa", "bộ môn"]),
     ("semester", ["học kỳ", "học kì", "semester"]),
-    ("instructor", ["giảng viên", "giáo viên", "phụ trách"]),
+    ("instructor", ["giảng viên", "giáo viên", "phụ trách", "ai dạy"]),
+    ("classroom", ["phòng học", "phòng"]),
     ("course_name", ["tên"]),
     ("course_description", ["mô tả", "mục tiêu", "giới thiệu", "nội dung"]),
 ]

@@ -135,9 +135,10 @@ class SystemEvaluator:
                         if note["qid"] == tc["qid"]:
                             note["contextual_answer"] = ans_ctx
 
-        # 5. Đánh giá nhóm câu hỏi bổ sung theo Mục 6 đề bài:
-        #    (a) Câu hỏi hợp lệ trong miền nhưng Knowledge Base không có thông tin
-        #    (b) Câu hỏi GET_DEADLINE và các cách diễn đạt trong đề bài PDF
+        # 5. Đánh giá bộ kiểm thử mở rộng 20 câu (E01–E20) theo Mục 6 đề bài:
+        #    - Nhóm A (E01–E05): Câu hỏi hợp lệ trong miền nhưng Knowledge Base không có thông tin
+        #    - Nhóm B (E06–E13): Truy vấn chi tiết các thuộc tính môn học & GET_DEADLINE
+        #    - Nhóm C (E14–E20): Các cách diễn đạt khác nhau (Paraphrases), câu mẫu trong PDF & FAQ
         extra_cases = [
             {
                 "id": "E01 (KB-Missing)",
@@ -147,32 +148,116 @@ class SystemEvaluator:
             },
             {
                 "id": "E02 (KB-Missing)",
+                "query": "Ai dạy môn CO3085?",
+                "category": "Cách diễn đạt khác hỏi tên giảng viên (KB không lưu thông tin giảng viên)",
+                "expect_fallback": True,
+            },
+            {
+                "id": "E03 (KB-Missing)",
+                "query": "Phòng học của môn NLP ở đâu?",
+                "category": "Câu hỏi hỏi phòng học (classroom không tồn tại trong course_info.txt)",
+                "expect_fallback": True,
+            },
+            {
+                "id": "E04 (KB-Missing)",
                 "query": "Chương 15 nói về gì?",
                 "category": "Câu hỏi hỏi chương vượt quá 12 chương của môn học (không tồn tại trong topics.txt)",
                 "expect_fallback": True,
             },
             {
-                "id": "E03 (KB-Missing)",
+                "id": "E05 (KB-Missing)",
                 "query": "Phần V của bài tập lớn là gì?",
                 "category": "Câu hỏi hỏi phần bài tập không tồn tại (BTL chỉ có Phần I–IV)",
                 "expect_fallback": True,
             },
             {
-                "id": "E04 (GET_DEADLINE)",
+                "id": "E06 (Course-Attr)",
+                "query": "Môn NLP có bao nhiêu ECTS?",
+                "category": "Truy vấn số tín chỉ ECTS từ course_info.txt",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E07 (Course-Attr)",
+                "query": "Thời lượng của môn học là bao nhiêu?",
+                "category": "Truy vấn tổng số giờ học (lý thuyết, BTL, tự học) từ course_info.txt",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E08 (Course-Attr)",
+                "query": "Cách đánh giá môn học như thế nào?",
+                "category": "Truy vấn tỷ lệ đánh giá điểm môn học (assessment)",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E09 (Course-Attr)",
+                "query": "Hình thức thi của môn học là gì?",
+                "category": "Truy vấn hình thức thi giữa kỳ và cuối kỳ (exam_format)",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E10 (Course-Attr)",
+                "query": "Khoa nào phụ trách môn NLP?",
+                "category": "Truy vấn đơn vị phụ trách (department)",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E11 (Course-Attr)",
+                "query": "Môn NLP học ở học kỳ nào?",
+                "category": "Truy vấn học kỳ mở môn học (semester)",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E12 (GET_DEADLINE)",
                 "query": "Deadline của bài tập lớn là khi nào?",
-                "category": "Câu hỏi thời hạn nộp bài tập lớn (GET_DEADLINE)",
+                "category": "Câu hỏi thời hạn nộp bài tập lớn (GET_DEADLINE - có từ 'của')",
                 "expect_fallback": False,
             },
             {
-                "id": "E05 (Paraphrase)",
+                "id": "E13 (GET_DEADLINE)",
+                "query": "Deadline bài tập lớn là khi nào?",
+                "category": "Câu hỏi thời hạn nộp bài tập lớn (GET_DEADLINE - ví dụ trang 5 đề bài PDF)",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E14 (Aggregation)",
+                "query": "Có bao nhiêu chương?",
+                "category": "Câu hỏi tổng hợp danh sách và số lượng chương của môn học",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E15 (Aggregation)",
+                "query": "Môn học có bao nhiêu tuần?",
+                "category": "Câu hỏi tổng hợp kế hoạch 15 tuần học",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E16 (Paraphrase)",
                 "query": "Tuần 5 học những nội dung gì?",
-                "category": "Cách diễn đạt khác của GET_SCHEDULE trong đề bài PDF",
+                "category": "Cách diễn đạt khác của GET_SCHEDULE trong trang 2 đề bài PDF",
                 "expect_fallback": False,
             },
             {
-                "id": "E06 (Paraphrase)",
+                "id": "E17 (Paraphrase)",
+                "query": "Phần CFG và Parsing nằm ở tuần nào?",
+                "category": "Truy vấn tuần học theo cặp chủ đề (ví dụ trang 2 đề bài PDF)",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E18 (Paraphrase)",
                 "query": "Tài liệu nào nói về CFG?",
-                "category": "Cách diễn đạt khác của GET_RESOURCE theo chủ đề CFG",
+                "category": "Truy vấn tài liệu tham khảo theo chủ đề CFG (ví dụ trang 2 đề bài PDF)",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E19 (Paraphrase)",
+                "query": "Bài tập lớn có được sử dụng công cụ AI không?",
+                "category": "Cách diễn đạt khác hỏi quy định sử dụng AI (ví dụ trang 2 đề bài PDF)",
+                "expect_fallback": False,
+            },
+            {
+                "id": "E20 (Regulation)",
+                "query": "Quy định về điểm danh là gì?",
+                "category": "Truy vấn quy định tham dự lớp học (ATTENDANCE)",
                 "expect_fallback": False,
             },
         ]

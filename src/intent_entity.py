@@ -89,20 +89,36 @@ class IntentEntityDetector:
             return f"WEEK_{int(val):02d}"
 
         elif tag == 'PART_NUM':
-            return f"PART_{val.upper()}"
+            num_map = {'1': 'I', '2': 'II', '3': 'III', '4': 'IV', '5': 'V'}
+            roman = num_map.get(val, val.upper())
+            return f"PART_{roman}"
 
         elif tag == 'ASSIGN_PART':
-            if val in ['parser', 'grammar']:
+            if val in ['parser', 'grammar', 'ngữ_pháp', 'phân_tích_cú_pháp']:
                 return 'PART_I'
-            elif val in ['hỏi_đáp', 'qa', 'semantic']:
+            elif val in ['hỏi_đáp', 'qa', 'semantic', 'diễn_dịch_ngữ_nghĩa']:
                 return 'PART_II'
+            elif val in ['ngữ_cảnh']:
+                return 'PART_III'
+            elif val in ['đánh_giá', 'evaluation']:
+                return 'PART_IV'
             return val.upper()
 
         elif tag in ['RULE_TERM', 'AI_TERM']:
-            if val in ['ai', 'trí_tuệ_nhân_tạo']:
+            if val in ['ai', 'trí_tuệ_nhân_tạo', 'chatgpt']:
                 return 'AI_USAGE'
             if val in ['llm', 'rag', 'llm_rag', 'llm rag']:
                 return 'LLM_RAG'
+            if val in ['điểm_danh', 'tham_dự_lớp']:
+                return 'ATTENDANCE'
+            if val in ['liêm_chính_học_thuật']:
+                return 'ACADEMIC_INTEGRITY'
+            if val in ['chia_sẻ_bài_làm', 'sao_chép_code']:
+                return 'ASSIGNMENT_SHARING'
+            if val in ['thư_viện_bên_ngoài']:
+                return 'EXTERNAL_LIBRARIES'
+            if val in ['mã_nguồn']:
+                return 'SOURCE_CODE'
             return val.upper()
 
         elif tag in ['TOPIC_ABBR', 'TOPIC_EN', 'TOPIC_VI', 'RES_TOPIC']:

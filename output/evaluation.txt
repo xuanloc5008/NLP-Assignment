@@ -8,7 +8,7 @@ Hướng tiếp cận: Classical / Statistical NLP (CFG + Rule-based Semantic & 
   - Câu hỏi hợp lệ trong miền & các cách diễn đạt tương đương (In-Scope): 28 câu (Q001–Q025, Q029, Q031, Q033)
   - Câu hỏi ngoài phạm vi môn học (Out-of-Scope): 3 câu (Q026–Q028)
   - Câu hỏi phụ thuộc ngữ cảnh (Context-Dependent): 3 câu (Q030, Q032, Q034)
-• Tập kiểm thử mở rộng (KB-Missing Info, GET_DEADLINE & Paraphrases): 6 câu (Đạt: 6/6 câu - 100.00%)
+• Tập kiểm thử mở rộng (KB-Missing Info, GET_DEADLINE & Paraphrases): 20 câu (Đạt: 20/20 câu - 100.00%)
 • Tập hội thoại đa lượt có ngữ cảnh cục bộ (data/dialogues.txt): 5 hội thoại / 10 lượt hỏi (Đạt: 5/5 hội thoại - 100.00%)
 
 • Độ chính xác Phân tích cú pháp (CFG Parsing Accuracy): 34/34 câu (100.00%)
@@ -26,26 +26,82 @@ Hướng tiếp cận: Classical / Statistical NLP (CFG + Rule-based Semantic & 
   - Intent/Entity: GET_COURSE_INFO | {'course': 'CO3085'}
   - Truy vấn KB: SELECT instructor FROM course_info WHERE course_id = 'CO3085'
   - Câu trả lời: "Xin lỗi, tôi không tìm thấy thông tin này trong dữ liệu của môn học."
-• [E02 (KB-Missing)] "Chương 15 nói về gì?" (Câu hỏi hỏi chương vượt quá 12 chương của môn học (không tồn tại trong topics.txt)) -> [PASS]
-  - Intent/Entity: UNKNOWN | {'status': 'OUT_OF_SCOPE'}
-  - Truy vấn KB: NO_QUERY -- intent=UNKNOWN (ngoài phạm vi)
+• [E02 (KB-Missing)] "Ai dạy môn CO3085?" (Cách diễn đạt khác hỏi tên giảng viên (KB không lưu thông tin giảng viên)) -> [PASS]
+  - Intent/Entity: GET_COURSE_INFO | {'course': 'CO3085'}
+  - Truy vấn KB: SELECT instructor FROM course_info WHERE course_id = 'CO3085'
   - Câu trả lời: "Xin lỗi, tôi không tìm thấy thông tin này trong dữ liệu của môn học."
-• [E03 (KB-Missing)] "Phần V của bài tập lớn là gì?" (Câu hỏi hỏi phần bài tập không tồn tại (BTL chỉ có Phần I–IV)) -> [PASS]
-  - Intent/Entity: UNKNOWN | {'status': 'OUT_OF_SCOPE'}
-  - Truy vấn KB: NO_QUERY -- intent=UNKNOWN (ngoài phạm vi)
+• [E03 (KB-Missing)] "Phòng học của môn NLP ở đâu?" (Câu hỏi hỏi phòng học (classroom không tồn tại trong course_info.txt)) -> [PASS]
+  - Intent/Entity: GET_COURSE_INFO | {'course': 'CO3085'}
+  - Truy vấn KB: SELECT classroom FROM course_info WHERE course_id = 'CO3085'
   - Câu trả lời: "Xin lỗi, tôi không tìm thấy thông tin này trong dữ liệu của môn học."
-• [E04 (GET_DEADLINE)] "Deadline của bài tập lớn là khi nào?" (Câu hỏi thời hạn nộp bài tập lớn (GET_DEADLINE)) -> [PASS]
+• [E04 (KB-Missing)] "Chương 15 nói về gì?" (Câu hỏi hỏi chương vượt quá 12 chương của môn học (không tồn tại trong topics.txt)) -> [PASS]
+  - Intent/Entity: GET_TOPIC | {'chapter': 'CH15'}
+  - Truy vấn KB: SELECT title, summary FROM topics WHERE chapter_id = 'CH15'
+  - Câu trả lời: "Xin lỗi, tôi không tìm thấy thông tin này trong dữ liệu của môn học."
+• [E05 (KB-Missing)] "Phần V của bài tập lớn là gì?" (Câu hỏi hỏi phần bài tập không tồn tại (BTL chỉ có Phần I–IV)) -> [PASS]
+  - Intent/Entity: GET_ASSIGNMENT | {'assignment_part': 'PART_V', 'assignment_id': 'BTL01'}
+  - Truy vấn KB: SELECT title, requirements FROM assignments WHERE assignment_id = 'BTL01' AND part = 'PART_V'
+  - Câu trả lời: "Xin lỗi, tôi không tìm thấy thông tin này trong dữ liệu của môn học."
+• [E06 (Course-Attr)] "Môn NLP có bao nhiêu ECTS?" (Truy vấn số tín chỉ ECTS từ course_info.txt) -> [PASS]
+  - Intent/Entity: GET_COURSE_INFO | {'course': 'CO3085'}
+  - Truy vấn KB: SELECT ects FROM course_info WHERE course_id = 'CO3085'
+  - Câu trả lời: "Số ECTS của môn Xử lý Ngôn ngữ Tự nhiên (CO3085): 6."
+• [E07 (Course-Attr)] "Thời lượng của môn học là bao nhiêu?" (Truy vấn tổng số giờ học (lý thuyết, BTL, tự học) từ course_info.txt) -> [PASS]
+  - Intent/Entity: GET_COURSE_INFO | {'course': 'CO3085'}
+  - Truy vấn KB: SELECT hours FROM course_info WHERE course_id = 'CO3085'
+  - Câu trả lời: "Môn học có tổng cộng 150 giờ gồm lý thuyết 30 giờ, bài tập lớn 45 giờ và tự học 60 giờ."
+• [E08 (Course-Attr)] "Cách đánh giá môn học như thế nào?" (Truy vấn tỷ lệ đánh giá điểm môn học (assessment)) -> [PASS]
+  - Intent/Entity: GET_COURSE_INFO | {'course': 'CO3085'}
+  - Truy vấn KB: SELECT assessment FROM course_info WHERE course_id = 'CO3085'
+  - Câu trả lời: "Cách đánh giá môn học: chuyên cần và bài tập 15%, bài tập lớn 15%, thi giữa kỳ 30% và thi cuối kỳ 40%."
+• [E09 (Course-Attr)] "Hình thức thi của môn học là gì?" (Truy vấn hình thức thi giữa kỳ và cuối kỳ (exam_format)) -> [PASS]
+  - Intent/Entity: GET_COURSE_INFO | {'course': 'CO3085'}
+  - Truy vấn KB: SELECT exam_format FROM course_info WHERE course_id = 'CO3085'
+  - Câu trả lời: "Theo đề cương: bài thi giữa kỳ (midterm) kéo dài 60 phút, hình thức open-book, written; bài thi cuối kỳ (final) kéo dài 90 phút, hình thức open-book, written."
+• [E10 (Course-Attr)] "Khoa nào phụ trách môn NLP?" (Truy vấn đơn vị phụ trách (department)) -> [PASS]
+  - Intent/Entity: GET_COURSE_INFO | {'course': 'CO3085'}
+  - Truy vấn KB: SELECT department FROM course_info WHERE course_id = 'CO3085'
+  - Câu trả lời: "Đơn vị phụ trách của môn Xử lý Ngôn ngữ Tự nhiên (CO3085): Khoa Khoa học và Kỹ thuật Máy tính."
+• [E11 (Course-Attr)] "Môn NLP học ở học kỳ nào?" (Truy vấn học kỳ mở môn học (semester)) -> [PASS]
+  - Intent/Entity: GET_COURSE_INFO | {'course': 'CO3085'}
+  - Truy vấn KB: SELECT semester FROM course_info WHERE course_id = 'CO3085'
+  - Câu trả lời: "Học kỳ của môn Xử lý Ngôn ngữ Tự nhiên (CO3085): HK261."
+• [E12 (GET_DEADLINE)] "Deadline của bài tập lớn là khi nào?" (Câu hỏi thời hạn nộp bài tập lớn (GET_DEADLINE - có từ 'của')) -> [PASS]
   - Intent/Entity: GET_DEADLINE | {'assignment_id': 'BTL01'}
   - Truy vấn KB: SELECT week, milestone FROM schedule
   - Câu trả lời: "Các mốc bài tập lớn (dữ liệu mẫu): tuần 8: BTL checkpoint 1 - grammar and parser; tuần 12: BTL checkpoint 2 - semantic interpretation and QA; tuần 15: BTL final submission and demo."
-• [E05 (Paraphrase)] "Tuần 5 học những nội dung gì?" (Cách diễn đạt khác của GET_SCHEDULE trong đề bài PDF) -> [PASS]
+• [E13 (GET_DEADLINE)] "Deadline bài tập lớn là khi nào?" (Câu hỏi thời hạn nộp bài tập lớn (GET_DEADLINE - ví dụ trang 5 đề bài PDF)) -> [PASS]
+  - Intent/Entity: GET_DEADLINE | {'assignment_id': 'BTL01'}
+  - Truy vấn KB: SELECT week, milestone FROM schedule
+  - Câu trả lời: "Các mốc bài tập lớn (dữ liệu mẫu): tuần 8: BTL checkpoint 1 - grammar and parser; tuần 12: BTL checkpoint 2 - semantic interpretation and QA; tuần 15: BTL final submission and demo."
+• [E14 (Aggregation)] "Có bao nhiêu chương?" (Câu hỏi tổng hợp danh sách và số lượng chương của môn học) -> [PASS]
+  - Intent/Entity: GET_TOPIC | {}
+  - Truy vấn KB: SELECT chapter_id, title FROM topics
+  - Câu trả lời: "Môn học gồm 12 chương: Chương 1 – Introduction to Natural Language Processing; Chương 2 – Linguistic Background - English Syntax; Chương 3 – Grammar and Parsing; Chương 4 – Features and Augmented Grammar; Chương 5 – Grammar for Natural Language; Chương 6 – Ambiguity Resolution - Statistical Methods; Chương 7 – Semantics and Logical Form; Chương 8 – Linking Syntax and Semantics; Chương 9 – Ambiguity Resolution; Chương 10 – Other Strategies for Semantic Interpretation; Chương 11 – Knowledge Representation and Reasoning; Chương 12 – Discourse Context and Reference."
+• [E15 (Aggregation)] "Môn học có bao nhiêu tuần?" (Câu hỏi tổng hợp kế hoạch 15 tuần học) -> [PASS]
+  - Intent/Entity: GET_SCHEDULE | {}
+  - Truy vấn KB: SELECT week, chapter FROM schedule
+  - Câu trả lời: "Kế hoạch học tập 15 tuần: tuần 1: Introduction to Natural Language Processing; tuần 2: Linguistic Background - English Syntax; tuần 3: Grammar and Parsing; tuần 4: Features and Augmented Grammar; tuần 5: Features and Augmented Grammar; tuần 6: Grammar for Natural Language; tuần 7: Ambiguity Resolution - Statistical Methods; tuần 8: Ambiguity Resolution - Statistical Methods; tuần 9: Semantics and Logical Form; tuần 10: Linking Syntax and Semantics; tuần 11: Ambiguity Resolution; tuần 12: Other Strategies for Semantic Interpretation; tuần 13: Knowledge Representation and Reasoning; tuần 14: Discourse Context and Reference; tuần 15: Integration and Evaluation."
+• [E16 (Paraphrase)] "Tuần 5 học những nội dung gì?" (Cách diễn đạt khác của GET_SCHEDULE trong trang 2 đề bài PDF) -> [PASS]
   - Intent/Entity: GET_SCHEDULE | {'week': 'WEEK_05'}
   - Truy vấn KB: SELECT chapter, topics FROM schedule WHERE week = 'WEEK_05'
   - Câu trả lời: "Tuần 5 học Chương 4 – Features and Augmented Grammar, gồm các chủ đề: augmented transition networks, generalized feature systems, unification grammar. Hoạt động: feature-based parsing exercises."
-• [E06 (Paraphrase)] "Tài liệu nào nói về CFG?" (Cách diễn đạt khác của GET_RESOURCE theo chủ đề CFG) -> [PASS]
+• [E17 (Paraphrase)] "Phần CFG và Parsing nằm ở tuần nào?" (Truy vấn tuần học theo cặp chủ đề (ví dụ trang 2 đề bài PDF)) -> [PASS]
+  - Intent/Entity: GET_SCHEDULE | {'topic': 'PARSING'}
+  - Truy vấn KB: SELECT week FROM schedule WHERE topic LIKE '%PARSING%'
+  - Câu trả lời: "Chủ đề parsing được học vào tuần 3, tuần 4, tuần 8, tuần 12 và tuần 15."
+• [E18 (Paraphrase)] "Tài liệu nào nói về CFG?" (Truy vấn tài liệu tham khảo theo chủ đề CFG (ví dụ trang 2 đề bài PDF)) -> [PASS]
   - Intent/Entity: GET_RESOURCE | {'topic': 'CFG', 'resource_topic': 'CFG'}
   - Truy vấn KB: SELECT title, authors FROM resources WHERE usage LIKE '%cfg%'
   - Câu trả lời: "Tài liệu cho Chương 3 – Grammar and Parsing: có thể tham khảo các giáo trình nền tảng: Lecture Slides from the Stanford Coursera course by Dan Jurafsky and Christopher Manning (2016); Introduction to Natural Language Processing (Jacob Eisenstein, 2019); Xử lý ngôn ngữ tự nhiên (Phan Thị Tươi, 2012)."
+• [E19 (Paraphrase)] "Bài tập lớn có được sử dụng công cụ AI không?" (Cách diễn đạt khác hỏi quy định sử dụng AI (ví dụ trang 2 đề bài PDF)) -> [PASS]
+  - Intent/Entity: GET_RULE | {'rule_term': 'AI_USAGE', 'assignment_id': 'BTL01'}
+  - Truy vấn KB: SELECT content FROM regulations WHERE rule = 'AI_USAGE'
+  - Câu trả lời: "Quy định về sử dụng AI: Sinh viên phải khai báo việc sử dụng AI trong báo cáo, nghiên cứu và quá trình thực hiện theo quy định của môn học."
+• [E20 (Regulation)] "Quy định về điểm danh là gì?" (Truy vấn quy định tham dự lớp học (ATTENDANCE)) -> [PASS]
+  - Intent/Entity: GET_RULE | {'rule_term': 'ATTENDANCE'}
+  - Truy vấn KB: SELECT content FROM regulations WHERE rule = 'ATTENDANCE'
+  - Câu trả lời: "Quy định về tham dự lớp: Sinh viên được khuyến khích tham dự đầy đủ các buổi học và thực hiện các bài tập được giao."
 
 3. CÁC TRƯỜNG HỢP TRẢ LỜI SAI / CẦN LƯU Ý KHI CHẠY ĐỘC LẬP KHÔNG CÓ NGỮ CẢNH:
 • [Q030] Câu hỏi: "Nó có liên quan đến parsing không?"

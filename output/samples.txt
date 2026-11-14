@@ -1789,6 +1789,18 @@ phần xác định tâm và tham chiếu nằm ở tuần nào
 phần xác định tâm và đồng tham chiếu nằm ở tuần nào
 phần xác định tâm và quan hệ quy chiếu nằm ở tuần nào
 phần xác định tâm và xác định tâm nằm ở tuần nào
+có bao nhiêu tuần
+có mấy tuần
+môn học có bao nhiêu tuần
+môn học có mấy tuần
+môn nlp có bao nhiêu tuần
+môn nlp có mấy tuần
+môn co3085 có bao nhiêu tuần
+môn co3085 có mấy tuần
+môn xử lý ngôn ngữ tự nhiên có bao nhiêu tuần
+môn xử lý ngôn ngữ tự nhiên có mấy tuần
+môn natural language processing có bao nhiêu tuần
+môn natural language processing có mấy tuần
 chương nào nói về cfg
 chương nào nói về pcfg
 chương nào nói về wsd
@@ -8004,6 +8016,26 @@ chương 12 có tham chiếu không
 chương 12 có đồng tham chiếu không
 chương 12 có quan hệ quy chiếu không
 chương 12 có xác định tâm không
+có bao nhiêu chương
+có mấy chương
+môn học có bao nhiêu chương
+môn học có mấy chương
+môn nlp có bao nhiêu chương
+môn nlp có mấy chương
+môn co3085 có bao nhiêu chương
+môn co3085 có mấy chương
+môn xử lý ngôn ngữ tự nhiên có bao nhiêu chương
+môn xử lý ngôn ngữ tự nhiên có mấy chương
+môn natural language processing có bao nhiêu chương
+môn natural language processing có mấy chương
+nlp có bao nhiêu chương
+nlp có mấy chương
+co3085 có bao nhiêu chương
+co3085 có mấy chương
+xử lý ngôn ngữ tự nhiên có bao nhiêu chương
+xử lý ngôn ngữ tự nhiên có mấy chương
+natural language processing có bao nhiêu chương
+natural language processing có mấy chương
 bài tập lớn yêu cầu xây dựng những gì
 bài tập lớn có những yêu cầu gì
 tôi cần hoàn thành những bài tập nào

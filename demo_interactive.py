@@ -114,5 +114,9 @@ def run_interactive():
 if __name__ == "__main__":
     if "--demo" in sys.argv:
         run_preset_demo()
+    elif len(sys.argv) > 1:
+        bot = InteractiveAssistant()
+        for arg_q in sys.argv[1:]:
+            bot.ask(arg_q)
     else:
         run_interactive()

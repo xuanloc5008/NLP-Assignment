@@ -99,8 +99,10 @@ class IntentEntityDetector:
             return val.upper()
 
         elif tag in ['RULE_TERM', 'AI_TERM']:
-            if val == 'ai':
+            if val in ['ai', 'trí_tuệ_nhân_tạo']:
                 return 'AI_USAGE'
+            if val in ['llm', 'rag', 'llm_rag', 'llm rag']:
+                return 'LLM_RAG'
             return val.upper()
 
         elif tag in ['TOPIC_ABBR', 'TOPIC_EN', 'TOPIC_VI', 'RES_TOPIC']:

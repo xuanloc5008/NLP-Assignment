@@ -73,6 +73,7 @@ COURSE_ATTR_KEYWORDS = [
     ("learning_outcomes", ["chuẩn đầu ra", "learning outcome"]),
     ("department", ["khoa", "bộ môn"]),
     ("semester", ["học kỳ", "học kì", "semester"]),
+    ("instructor", ["giảng viên", "giáo viên", "phụ trách"]),
     ("course_name", ["tên"]),
     ("course_description", ["mô tả", "mục tiêu", "giới thiệu", "nội dung"]),
 ]
@@ -141,6 +142,13 @@ class QueryEngine:
                 if v is None:
                     continue
             ent[k.lower()] = v
+
+        if "lo_code" in ent and "lo" not in ent:
+            ent["lo"] = ent.pop("lo_code")
+        if "rule_term" in ent and "rule_topic" not in ent:
+            ent["rule_topic"] = ent.pop("rule_term")
+        if "assignment_id" in ent and "assignment" not in ent:
+            ent["assignment"] = ent.pop("assignment_id")
 
         if "chapter" in ent:
             ent["chapter"] = self._norm_chapter(ent["chapter"])
@@ -618,6 +626,12 @@ class QueryEngine:
 
             exact = [r for r in res if _contains(text(r), phrase)]
             res = exact or [r for r in res if words and all(_contains(text(r), x) for x in words)]
+            if not res:
+                topic_key = self._norm_topic(phrase)
+                chs = self._chapters_for_topic(topic_key) if topic_key else []
+                if chs:
+                    res = [r for r in self.kb.resources.values() if r["type"] == "textbook"]
+                    return {"type": "resources", "data": res, "topic": phrase, "chapter": self.kb.topics.get(chs[0])}
         if not res:
             return None
         return {"type": "resources", "data": res, "topic": w.get("usage"),

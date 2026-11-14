@@ -142,13 +142,21 @@ def verify():
         eval_text = f.read()
     eval_ok = (
         "34/34 câu (100.00%)" in eval_text
+        and "KIỂM THỬ CÂU HỎI MÀ KNOWLEDGE BASE KHÔNG CÓ THÔNG TIN" in eval_text
         and "PHÂN TÍCH NGUYÊN NHÂN LỖI" in eval_text
         and "ƯU ĐIỂM VÀ HẠN CHẾ" in eval_text
     )
     all_passed &= check(
         eval_ok,
-        "Phần IV evaluation.txt: Đầy đủ thống kê độ chính xác (34/34 - 100%), phân tích lỗi và nhận xét ưu/nhược điểm Classical NLP",
+        "Phần IV evaluation.txt: Đầy đủ thống kê độ chính xác (34/34 - 100%), câu hỏi KB không có thông tin, phân tích lỗi & ưu/nhược điểm",
     )
+
+    # Kiểm tra cấu trúc nộp bài (Mục 7.4 & 7.5)
+    for req_item in ["src", "data", "models", "input", "output", "README.md", "Dockerfile"]:
+        all_passed &= check(
+            os.path.exists(os.path.join(PROJECT_ROOT, req_item)),
+            f"Mục 7.4 Cấu trúc nộp bài có đủ: {req_item}",
+        )
 
     # Kiểm tra chạy độc lập từng module CLI (`python -m src.<module>`)
     print("\n================================================================================")

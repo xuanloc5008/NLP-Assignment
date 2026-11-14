@@ -14,13 +14,13 @@
 | 3 | **Đức Anh** | **Mục 3.3: Xây dựng bộ phân tích cú pháp (Parser)**<br>Dùng Chart Parser phân tích `input/sentences.txt`, xuất cây cú pháp hoặc `()`. | `src/parser.py` | `output/parse-results.txt` | **HOÀN THÀNH** |
 | 4 | **Xuân Lộc** | **Lead Integrator, Tokenizer & Test Pipeline**<br>Viết Tokenizer tiền xử lý từ ghép tiếng Việt, gộp code các nhánh và viết script kiểm thử tự động. | `src/tokenizer.py`<br>`src/grammar_loader.py`<br>`src/main_part1.py` | Toàn bộ pipeline Phần I | **HOÀN THÀNH** |
 
-#### 1.2. Phần II, III & IV: Diễn giải ngữ nghĩa, Hội thoại & Đánh giá (Kế hoạch thực hiện tiếp theo)
-| STT | Họ và Tên | Nhiệm vụ chính trong Phần 2, 3, 4 | File mã nguồn phụ trách | Output chịu trách nhiệm |
-| :---: | :--- | :--- | :--- | :--- |
-| 1 | **Đinh Hải Nam** | **Mục 4.1.1: Xây dựng biểu diễn ngữ nghĩa (Semantic Representation)**<br>Ánh xạ cây cú pháp / câu sang biểu diễn vị từ/logic (`GET_CREDIT(...)`, `GET_SCHEDULE(...)`, `GET_TOPIC(...)`...). | `src/semantic.py` | `output/semantic.txt` |
-| 2 | **Thành Nhân** | **Mục 4.1.2: Nhận diện Intent & Trích xuất Entity**<br>Nhận diện 8 loại ý định và trích xuất thực thể theo Lexicon chuẩn từ `entities.txt` (dùng rule matching hoặc TF-IDF/ML). | `src/intent_entity.py` | `output/intent-entity.txt` |
-| 3 | **Đức Anh** | **Mục 4.1.3 + 4.1.4 + 4.1.5: Knowledge Base, Query & Sinh câu trả lời (NLG)**<br>Đọc và chỉ mục hoá `data/*.txt`; chuyển (Intent, Entity) thành câu truy vấn; sinh câu trả lời tự nhiên dạng template và xử lý fallback cho câu ngoài phạm vi. | `src/knowledge_base.py`<br>`src/query_engine.py`<br>`src/nlg.py` | `output/query.txt`<br>`output/answer.txt` |
-| 4 | **Xuân Lộc** | **Phần III (Ngữ cảnh hội thoại) & Phần IV (Đánh giá) + Lead Integrator**<br>Quản lý State Memory xử lý đại từ tham chiếu ("nó", "phần này", "chương sau"); xây dựng test suite tính Accuracy và phân tích lỗi; ráp nối toàn bộ pipeline. | `src/dialogue.py`<br>`src/evaluator.py`<br>`src/main.py` | `output/dialogue.txt`<br>`output/evaluation.txt` |
+#### 1.2. Phần II, III & IV: Diễn giải ngữ nghĩa, Hội thoại & Đánh giá (ĐÃ HOÀN THÀNH 100%)
+| STT | Họ và Tên | Nhiệm vụ chính trong Phần 2, 3, 4 | File mã nguồn phụ trách | Output chịu trách nhiệm | Trạng thái |
+| :---: | :--- | :--- | :--- | :--- | :---: |
+| 1 | **Đinh Hải Nam** | **Mục 4.1.1: Xây dựng biểu diễn ngữ nghĩa (Semantic Representation)**<br>Ánh xạ cây cú pháp sang biểu diễn vị từ/logic (`GET_CREDIT(...)`, `GET_SCHEDULE(...)`, `GET_TOPIC(...)`...). | `src/semantic.py` | `output/semantic.txt` | **HOÀN THÀNH** |
+| 2 | **Thành Nhân** | **Mục 4.1.2: Nhận diện Intent & Trích xuất Entity**<br>Nhận diện các loại ý định từ cây cú pháp CFG và trích xuất thực thể chuẩn hóa theo Lexicon từ `entities.txt`. | `src/intent_entity.py` | `output/intent-entity.txt` | **HOÀN THÀNH** |
+| 3 | **Đức Anh** | **Mục 4.1.3 + 4.1.4 + 4.1.5: Knowledge Base, Query & Sinh câu trả lời (NLG)**<br>Đọc và chỉ mục hoá `data/*.txt`; chuyển `(Intent, Entity)` thành câu truy vấn; sinh câu trả lời tự nhiên dạng template và xử lý fallback cho câu ngoài phạm vi / thiếu thông tin. | `src/knowledge_base.py`<br>`src/query_engine.py`<br>`src/nlg.py` | `output/query.txt`<br>`output/answer.txt` | **HOÀN THÀNH** |
+| 4 | **Xuân Lộc** | **Phần III (Ngữ cảnh hội thoại) & Phần IV (Đánh giá) + Lead Integrator**<br>Quản lý State Memory xử lý đồng tham chiếu ("nó", "chương này", "phần này", "còn chương sau", "nội dung này"); xây dựng bộ kiểm thử tính Accuracy và phân tích lỗi; tích hợp toàn bộ pipeline. | `src/dialogue.py`<br>`src/evaluator.py`<br>`src/main.py`<br>`verify_all.py` | `output/dialogue.txt`<br>`output/evaluation.txt` | **HOÀN THÀNH** |
 
 ---
 
@@ -86,10 +86,14 @@ Mỗi thành viên có thể chạy riêng mã nguồn của mình để kiểm 
 | **Đức Anh (4.1.3 - 4.1.5)** | `python3 -m src.nlg` | `output/query.txt`<br>`output/answer.txt` | Xuất câu truy vấn KB và câu trả lời |
 | **Xuân Lộc (Phần III & IV)** | `python3 -m src.dialogue`<br>`python3 -m src.evaluator` | `output/dialogue.txt`<br>`output/evaluation.txt` | Xử lý hội thoại & Báo cáo đánh giá |
 
-#### 4.3. Lệnh chạy toàn bộ hệ thống (End-to-End Pipeline)
+#### 4.3. Lệnh chạy toàn bộ hệ thống & Kiểm thử tự động (End-to-End Pipeline)
 Chạy toàn bộ pipeline từ Phần I đến Phần IV:
 ```bash
 python3 -m src.main
+```
+Chạy bộ kiểm thử tự động toàn diện (xác minh toàn bộ 9 file output bắt buộc và 6 module CLI độc lập):
+```bash
+python3 verify_all.py
 ```
 
 #### 4.4. Chạy kiểm thử qua Docker (Môi trường chấm bài của giảng viên)
@@ -142,5 +146,18 @@ docker run --rm -v $(pwd)/input:/nlp/input -v $(pwd)/output:/nlp/output course-a
 - Lưu trữ State Memory từ lượt tương tác trước.
 - Giải quyết đại từ thay thế (*"nó"*, *"chương này"*, *"phần này"*, *"còn chương sau?"*, *"nội dung này"*).
 
-#### 5.7. Đánh giá hệ thống (Phần IV)
-- Đánh giá trên tập `sample_queries.txt` đo lường Intent Accuracy, QA Accuracy, phân tích nguyên nhân lỗi và đánh giá ưu/nhược điểm của phương pháp Classical NLP.
+#### 5.7. Lựa chọn phương pháp & Cách đánh giá hệ thống (Phần IV - Mục 6 & 7.5)
+- **Lựa chọn hướng tiếp cận**: Nhóm lựa chọn **Lựa chọn 1: Classical / Statistical NLP** (hoàn toàn không sử dụng LLM hoặc API sinh văn bản bên ngoài trong luồng xử lý cốt lõi). Toàn bộ chuỗi xử lý tuân thủ chặt chẽ:
+  `Natural Language Input -> Tokenizer -> CFG ChartParser -> Semantic Representation -> Intent/Entity -> Structured Query -> Knowledge Base -> Template-based NLG Answer`.
+- **Phương pháp và kết quả đánh giá (`output/evaluation.txt`)**:
+  - Đánh giá trên **34 câu hỏi chuẩn** trong `data/sample_queries.txt` (28 câu hợp lệ và các cách diễn đạt tương đương, 3 câu ngoài phạm vi `Q026`–`Q028`, 3 câu phụ thuộc ngữ cảnh `Q030`, `Q032`, `Q034`), **6 câu kiểm thử mở rộng** (bao gồm câu hỏi thuộc miền nhưng KB không có thông tin như hỏi tên giảng viên, chương 15, phần V, cùng câu hỏi `GET_DEADLINE`), và **5 hội thoại đa lượt** trong `data/dialogues.txt`.
+  - **CFG Parsing Accuracy**: `34/34` (`100.00%`)
+  - **Intent Accuracy**: `34/34` (`100.00%`)
+  - **Entity Accuracy**: `31/34` (`91.18%` câu đơn độc lập) / `34/34` (`100.00%` khi kết hợp ngữ cảnh)
+  - **End-to-End QA Accuracy**: `31/34` (`91.18%` câu đơn độc lập) / `34/34` (`100.00%` khi tích hợp giải tham chiếu ngữ cảnh)
+  - **Xử lý câu hỏi ngoài phạm vi & câu hỏi KB không có thông tin**: `100.00%` trả về đúng thông báo Fallback chuẩn.
+
+#### 5.8. Các hạn chế của hệ thống (System Limitations - Mục 7.5)
+1. **Độ bao phủ của văn phạm CFG (Grammar Coverage)**: Do sử dụng văn phạm phi ngữ cảnh dựa trên luật (`models/grammar.cfg`), nếu người dùng đặt câu hỏi bằng văn nói tự do đảo cấu trúc mạnh hoặc dùng từ vựng/thuật ngữ ngoài từ điển (`entities.txt`), `ChartParser` sẽ từ chối câu (`()`) và chuyển sang chế độ Fallback.
+2. **Giải tham chiếu dựa trên lịch sử gần nhất (History-list Anaphora)**: Cơ chế lưu trữ trạng thái cục bộ (`DialogueManager`) giải quyết hiệu quả các hội thoại 2–3 lượt liên tiếp nhưng chưa xử lý trường hợp một câu chứa nhiều thực thể cùng loại cạnh tranh hoặc hội thoại chuyển chủ đề phức tạp qua nhiều lượt xa nhau.
+3. **Sinh câu trả lời theo mẫu cố định (Template-based NLG)**: Đảm bảo tính chính xác tuyệt đối (Zero Hallucination) nhưng văn phong câu trả lời theo khuôn mẫu cố định, ít biến thiên linh hoạt so với mô hình ngôn ngữ lớn.

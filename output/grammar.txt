@@ -48,13 +48,16 @@ Q_RESOURCE -> 'tài_liệu' 'tham_khảo' 'về' RES_TOPIC 'là' 'gì' \
 
 # 6. GET_LO  (Q009, Q010)
 Q_LO -> LO_CODE 'là' 'gì' \
+    | LO_CODE 'học' 'về' 'gì' \
     | LO_CODE 'liên_quan' 'đến' 'nội_dung' 'nào' \
     | 'chuẩn_đầu_ra' LO_CODE 'là' 'gì'
 
-# 7. CONTEXT_DEPENDENT - câu có đồng tham chiếu (Q030, Q032, Q034)
+# 7. CONTEXT_DEPENDENT - câu có đồng tham chiếu (Q030, Q032, Q034 & dialogues.txt)
 Q_CONTEXT -> CTX_REF 'có' 'liên_quan' 'đến' TOPIC_ENTITY 'không' \
             | 'còn' 'chương' CTX_DIR \
-            | CTX_REF 'cần' 'xuất' 'file' 'gì'
+            | CTX_REF 'cần' 'xuất' 'file' 'gì' \
+            | 'tài_liệu' 'của' CTX_REF 'là' 'gì' \
+            | CTX_REF 'nằm' 'ở' 'chương' 'nào'
 
 
 # ==============================================================================
@@ -67,7 +70,7 @@ HOW_MANY -> 'bao_nhiêu' | 'mấy'
 TOPIC_VERB -> 'nói' | 'học' | 'bàn'
 COURSE_METRIC -> 'tín_chỉ' | 'tiết'
 CTX_DIR -> 'sau' | 'trước'
-CTX_REF -> 'nó' | 'chương' 'này' | 'phần' 'này'
+CTX_REF -> 'nó' | 'chương' 'này' | 'phần' 'này' | 'nội_dung' 'này'
 
 # --- Thực thể COURSE ---
 COURSE_NAME -> 'nlp' | 'co3085' | 'xử_lý_ngôn_ngữ_tự_nhiên' | 'natural_language_processing'

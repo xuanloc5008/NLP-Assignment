@@ -30,14 +30,23 @@ class IntentEntityDetector:
         }
 
         self.entity_tags = [
-            'COURSE_NAME', 'CH_NUM', 'WEEK_NUM', 'PART_NUM',
+            'COURSE_NAME', 'WEEK_NUM', 'CH_NUM', 'PART_NUM',
             'ASSIGN_PART', 'RULE_TERM', 'AI_TERM', 'LO_CODE', 'EXAM',
             'TOPIC_ABBR', 'TOPIC_EN', 'TOPIC_VI', 'RES_TOPIC', 'CTX_REF', 'CTX_DIR'
         ]
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        self.grammar_path = os.path.join(project_root, "models", "grammar.cfg")
+        self._parser = None
         # Load lexicon từ entities.txt
         self.lexicon = {}
         self.vi_to_en_lexicon = {}
         self._load_entities(data_dir)
+
+    def _get_parser(self):
+        if self._parser is None:
+            from src.parser import CourseParser
+            self._parser = CourseParser(self.grammar_path)
+        return self._parser
 
     def _load_entities(self, data_dir: str):
         # Đọc và ánh xạ các thực thể từ file entities.txt
@@ -109,23 +118,32 @@ class IntentEntityDetector:
         return val
 
     def detect(self, parse_tree_str: str) -> tuple[str, dict]:
-        """Nhận vào chuỗi cây cú pháp, trả về (intent, dict_entities)"""
+        """Nhận vào chuỗi cây cú pháp hoặc câu tiếng Việt thô, trả về (intent, dict_entities)"""
         intent = "UNKNOWN"
         entities = {}
 
+        if not parse_tree_str:
+            return intent, {'status': 'OUT_OF_SCOPE'}
+
+        text_str = parse_tree_str.strip()
+        if not text_str.startswith('('):
+            text_str = self._get_parser().parse_sentence(text_str)
+
         # 1. Xử lý câu ngoài phạm vi (Parser trả về "()")
-        if not parse_tree_str or parse_tree_str.strip() == '()':
+        if not text_str or text_str.strip() == '()':
             return intent, {'status': 'OUT_OF_SCOPE'}
 
         # 2. Trích xuất Intent từ node cấp 1 ngay dưới S
-        intent_match = re.search(r'\(S \((Q_[A-Z_]+)', parse_tree_str)
+        intent_match = re.search(r'\(S \((Q_[A-Z_]+)', text_str)
         if intent_match:
             intent = self.intent_mapping.get(intent_match.group(1), "UNKNOWN")
 
         # 3. Trích xuất và chuẩn hóa Entities
+        tree_without_week = re.sub(r'\(WEEK_NUM\s+\(CH_NUM\s+[^\)]+\)\)', '', text_str)
         for tag in self.entity_tags:
+            search_str = tree_without_week if tag == 'CH_NUM' else text_str
             pattern = r'\(' + tag + r'\s+([^\)]+)\)'
-            matches = re.findall(pattern, parse_tree_str)
+            matches = re.findall(pattern, search_str)
 
             if matches:
                 clean_values = [self._clean_leaf_value(v) for v in matches]
@@ -156,8 +174,10 @@ class IntentEntityDetector:
                     entities[tag.lower()] = norm_val
 
         # 4. Gán mã BTL01 nếu câu hỏi nhắc đến bài tập lớn
-        if 'bài_tập_lớn' in parse_tree_str and 'assignment_id' not in entities:
+        if 'bài_tập_lớn' in text_str and 'assignment_id' not in entities:
             entities['assignment_id'] = 'BTL01'
+        if intent == 'GET_COURSE_INFO' and 'exam' not in entities and 'course' not in entities:
+            entities['course'] = 'CO3085'
 
         return intent, entities
 

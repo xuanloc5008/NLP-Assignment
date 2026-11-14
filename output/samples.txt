@@ -1390,6 +1390,42 @@ lo6.3 là gì
 lo6.4 là gì
 lo6.5 là gì
 lo6.6 là gì
+lo1.1 học về gì
+lo1.2 học về gì
+lo1.3 học về gì
+lo1.4 học về gì
+lo1.5 học về gì
+lo1.6 học về gì
+lo2.1 học về gì
+lo2.2 học về gì
+lo2.3 học về gì
+lo2.4 học về gì
+lo2.5 học về gì
+lo2.6 học về gì
+lo3.1 học về gì
+lo3.2 học về gì
+lo3.3 học về gì
+lo3.4 học về gì
+lo3.5 học về gì
+lo3.6 học về gì
+lo4.1 học về gì
+lo4.2 học về gì
+lo4.3 học về gì
+lo4.4 học về gì
+lo4.5 học về gì
+lo4.6 học về gì
+lo5.1 học về gì
+lo5.2 học về gì
+lo5.3 học về gì
+lo5.4 học về gì
+lo5.5 học về gì
+lo5.6 học về gì
+lo6.1 học về gì
+lo6.2 học về gì
+lo6.3 học về gì
+lo6.4 học về gì
+lo6.5 học về gì
+lo6.6 học về gì
 lo1.1 liên quan đến nội dung nào
 lo1.2 liên quan đến nội dung nào
 lo1.3 liên quan đến nội dung nào
@@ -1585,8 +1621,58 @@ phần này có liên quan đến tham chiếu không
 phần này có liên quan đến đồng tham chiếu không
 phần này có liên quan đến quan hệ quy chiếu không
 phần này có liên quan đến xác định tâm không
+nội dung này có liên quan đến cfg không
+nội dung này có liên quan đến pcfg không
+nội dung này có liên quan đến wsd không
+nội dung này có liên quan đến context free grammar không
+nội dung này có liên quan đến probabilistic context free grammar không
+nội dung này có liên quan đến dependency grammar không
+nội dung này có liên quan đến features không
+nội dung này có liên quan đến augmented grammar không
+nội dung này có liên quan đến unification không
+nội dung này có liên quan đến pos tagging không
+nội dung này có liên quan đến logical form không
+nội dung này có liên quan đến thematic roles không
+nội dung này có liên quan đến selectional restriction không
+nội dung này có liên quan đến semantic network không
+nội dung này có liên quan đến semantic grammar không
+nội dung này có liên quan đến knowledge representation không
+nội dung này có liên quan đến question answering không
+nội dung này có liên quan đến local discourse context không
+nội dung này có liên quan đến reference không
+nội dung này có liên quan đến anaphora không
+nội dung này có liên quan đến centering không
+nội dung này có liên quan đến parsing không
+nội dung này có liên quan đến parser không
+nội dung này có liên quan đến word sense disambiguation không
+nội dung này có liên quan đến văn phạm phụ thuộc không
+nội dung này có liên quan đến nét không
+nội dung này có liên quan đến văn phạm gia tố không
+nội dung này có liên quan đến hợp nhất không
+nội dung này có liên quan đến gán nhãn từ loại không
+nội dung này có liên quan đến dạng luận lý không
+nội dung này có liên quan đến vai trò chủ đề không
+nội dung này có liên quan đến giới hạn lựa chọn không
+nội dung này có liên quan đến mạng ngữ nghĩa không
+nội dung này có liên quan đến văn phạm ngữ nghĩa không
+nội dung này có liên quan đến biểu diễn tri thức không
+nội dung này có liên quan đến hỏi đáp không
+nội dung này có liên quan đến ngữ cảnh diễn ngôn cục bộ không
+nội dung này có liên quan đến tham chiếu không
+nội dung này có liên quan đến đồng tham chiếu không
+nội dung này có liên quan đến quan hệ quy chiếu không
+nội dung này có liên quan đến xác định tâm không
 còn chương sau
 còn chương trước
 nó cần xuất file gì
 chương này cần xuất file gì
 phần này cần xuất file gì
+nội dung này cần xuất file gì
+tài liệu của nó là gì
+tài liệu của chương này là gì
+tài liệu của phần này là gì
+tài liệu của nội dung này là gì
+nó nằm ở chương nào
+chương này nằm ở chương nào
+phần này nằm ở chương nào
+nội dung này nằm ở chương nào

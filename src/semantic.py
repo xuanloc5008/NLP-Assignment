@@ -14,7 +14,10 @@ class SemanticInterpreter:
         self.default_course = "CO3085"
         self.default_assignment = "PROJECT"
         self.entity_map = {}
-        
+
+        if entities_path is None:
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            entities_path = os.path.join(project_root, "data", "entities.txt")
         if entities_path and os.path.exists(entities_path):
             self._load_entities(entities_path)
 
@@ -57,17 +60,17 @@ class SemanticInterpreter:
     def _normalize_entity(self, label: str, raw_val: str) -> str:
         """Chuẩn hóa token từ Parser dựa vào từ điển entities.txt."""
         raw_val_lower = raw_val.lower()
-        
-        if raw_val_lower in self.entity_map:
-            return self.entity_map[raw_val_lower]
-            
+
         if label == 'COURSE_NAME':
             return self.default_course
         elif label == 'WEEK_NUM':
             return f"WEEK_{int(raw_val):02d}" if raw_val.isdigit() else raw_val.upper()
         elif label == 'CH_NUM':
             return f"CH{int(raw_val):02d}" if raw_val.isdigit() else raw_val.upper()
-            
+
+        if raw_val_lower in self.entity_map:
+            return self.entity_map[raw_val_lower]
+
         return raw_val.upper()
 
     def interpret(self, sentence: str, parse_tree_str: str = "") -> str:
@@ -105,7 +108,7 @@ class SemanticInterpreter:
                 entities['metric'] = norm_val
             elif label == 'WEEK_NUM' and 'week' not in entities:
                 entities['week'] = norm_val
-            elif label == 'CH_NUM' and 'chapter' not in entities:
+            elif label == 'CH_NUM' and 'chapter' not in entities and 'week' not in entities:
                 entities['chapter'] = norm_val
             elif label in ['TOPIC_ENTITY', 'TOPIC_ABBR', 'TOPIC_EN', 'TOPIC_VI', 'RES_TOPIC']:
                 if 'topic' not in entities:
@@ -116,6 +119,8 @@ class SemanticInterpreter:
                 entities['lo'] = norm_val
             elif label in ['ASSIGN_PART', 'PART_NUM']:
                 entities['assign_part'] = norm_val
+            elif label in ['RULE_TERM', 'AI_TERM']:
+                entities['rule'] = 'AI_USAGE' if norm_val == 'AI' else norm_val
 
         if intent_label == 'Q_COURSE_INFO':
             metric = entities.get('metric', '')
@@ -154,6 +159,8 @@ class SemanticInterpreter:
             return f"GET_ASSIGNMENT(assignment={self.default_assignment})"
 
         elif intent_label == 'Q_RULE':
+            if 'rule' in entities:
+                return f"GET_RULE(topic={entities['rule']})"
             return "GET_RULE()"
 
         elif intent_label == 'Q_RESOURCE':

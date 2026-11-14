@@ -62,8 +62,8 @@ def main():
 
     # 4.1.2: Intent & Entity -> intent-entity.txt (Thành viên 2)
     out_intent_entity = os.path.join(output_dir, "intent-entity.txt")
-    detector = IntentEntityDetector()
-    detector.process_file(input_file, out_intent_entity)
+    detector = IntentEntityDetector(data_dir)
+    detector.process_file(out_parse, out_intent_entity)
 
     # 4.1.3: Knowledge Base & Query -> query.txt (Thành viên 3)
     kb = KnowledgeBase(data_dir)

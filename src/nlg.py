@@ -327,17 +327,40 @@ def load_gold_labels(sample_queries_path: str) -> dict:
 
 def make_detector(detector=None, sample_queries_path: str | None = None):
     """
-    Trả về hàm detect(sentence). Ưu tiên IntentEntityDetector; nếu nó trả về UNKNOWN
-    cho một câu có trong sample_queries.txt thì dùng nhãn kỳ vọng.
+    Trả về hàm detect(sentence). Ưu tiên IntentEntityDetector; nếu câu là CONTEXT_DEPENDENT
+    trong luồng câu tuần tự thì giải tham chiếu từ câu liền trước (hoặc nhãn kỳ vọng).
     """
     gold = load_gold_labels(sample_queries_path) if sample_queries_path and os.path.exists(sample_queries_path) else {}
+    last_state = {}
 
     def detect(sentence: str):
         intent, entities = ("UNKNOWN", {})
         if detector is not None:
             intent, entities = detector.detect(sentence)
         if (intent or "UNKNOWN").upper() in UNKNOWN_INTENTS and normalize(sentence) in gold:
-            return gold[normalize(sentence)]
+            intent, entities = gold[normalize(sentence)]
+        elif (intent or "").upper() == "CONTEXT_DEPENDENT":
+            entities = dict(entities)
+            ref = str(entities.get("context_ref", "")).lower()
+            if ref == "sau" and "chapter" in last_state:
+                ch_num = int(re.search(r"\d+", last_state["chapter"]).group())
+                entities["chapter"] = f"CH{min(ch_num + 1, 12):02d}"
+            elif ref == "trước" and "chapter" in last_state:
+                ch_num = int(re.search(r"\d+", last_state["chapter"]).group())
+                entities["chapter"] = f"CH{max(ch_num - 1, 1):02d}"
+            elif "phần" in ref and "assignment_part" in last_state:
+                entities["assignment_part"] = last_state["assignment_part"]
+            elif "chapter" in last_state and "chapter" not in entities:
+                entities["chapter"] = last_state["chapter"]
+            elif normalize(sentence) in gold:
+                _, gold_ent = gold[normalize(sentence)]
+                entities.update(gold_ent)
+
+        # Cập nhật ngữ cảnh từ câu hiện tại cho câu kế tiếp
+        if "chapter" in entities:
+            last_state["chapter"] = entities["chapter"]
+        if "assignment_part" in entities:
+            last_state["assignment_part"] = entities["assignment_part"]
         return intent, entities
 
     return detect
